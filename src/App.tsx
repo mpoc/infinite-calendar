@@ -106,14 +106,15 @@ export const App = () => {
     <div ref={containerRef} className="min-h-screen bg-white font-light">
       {/* Header */}
       <div className="sticky top-0 bg-white z-10 border-b border-black">
-        <div className="grid grid-cols-[140px_repeat(7,1fr)]">
-          <div className="border-r border-black" />
-          {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
+        <div className="grid grid-cols-7 md:grid-cols-[140px_repeat(7,1fr)]">
+          <div className="hidden md:block border-r border-black" />
+          {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day, idx) => (
             <div
               key={day}
-              className="px-6 py-5 text-center border-r border-gray-300 last:border-r-0"
+              className="px-2 py-3 md:px-6 md:py-5 text-center border-r border-gray-300 last:border-r-0 text-xs md:text-base"
             >
-              {day}
+              <span className="md:hidden">{day.slice(0, 3)}</span>
+              <span className="hidden md:inline">{day}</span>
             </div>
           ))}
         </div>
@@ -127,36 +128,47 @@ export const App = () => {
           const monthLabel = getMonthLabel(week);
 
           return (
-            <div key={week.id} className="grid grid-cols-[140px_repeat(7,1fr)] border-b border-gray-300">
-              {/* Month label column */}
-              <div className="px-6 py-8 border-r border-gray-300 flex items-start justify-end">
-                {monthLabel && (
-                  <div className="text-sm text-gray-600 text-right leading-tight">
+            <div key={week.id}>
+              {/* Month label as full-width row on mobile, column on desktop */}
+              {monthLabel && (
+                <div className="md:hidden px-4 py-1 bg-gray-50 border-b border-gray-300">
+                  <div className="text-sm text-gray-600">
                     {monthLabel}
                   </div>
-                )}
+                </div>
+              )}
+
+              <div className="grid grid-cols-7 md:grid-cols-[140px_repeat(7,1fr)] border-b border-gray-300">
+                {/* Month label column - desktop only */}
+                <div className="hidden md:flex px-6 py-8 border-r border-gray-300 items-start justify-end">
+                  {monthLabel && (
+                    <div className="text-sm text-gray-600 text-right leading-tight">
+                      {monthLabel}
+                    </div>
+                  )}
+                </div>
+
+                {/* Day cells */}
+                {week.days.map((day) => {
+                  const isToday = day.hasSame(today, 'day');
+                  const isWeekend = day.weekday === 6 || day.weekday === 7;
+
+                  return (
+                    <div
+                      key={day.toISODate()}
+                      className={`px-2 py-4 md:px-6 md:py-8 border-r border-gray-300 last:border-r-0 min-h-[80px] md:min-h-[140px] transition-all duration-200 cursor-pointer ${
+                        isToday
+                          ? 'bg-black text-white'
+                          : isWeekend
+                          ? 'bg-gray-50 hover:bg-black hover:text-white'
+                          : 'hover:bg-black hover:text-white'
+                      }`}
+                    >
+                      <div className="text-lg md:text-2xl leading-none">{day.day}</div>
+                    </div>
+                  );
+                })}
               </div>
-
-              {/* Day cells */}
-              {week.days.map((day) => {
-                const isToday = day.hasSame(today, 'day');
-                const isWeekend = day.weekday === 6 || day.weekday === 7;
-
-                return (
-                  <div
-                    key={day.toISODate()}
-                    className={`px-6 py-8 border-r border-gray-300 last:border-r-0 min-h-[140px] transition-all duration-200 cursor-pointer ${
-                      isToday
-                        ? 'bg-black text-white'
-                        : isWeekend
-                        ? 'bg-gray-50 hover:bg-black hover:text-white'
-                        : 'hover:bg-black hover:text-white'
-                    }`}
-                  >
-                    <div className="text-2xl leading-none">{day.day}</div>
-                  </div>
-                );
-              })}
             </div>
           );
         })}
