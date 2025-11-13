@@ -9,7 +9,7 @@ type Week = {
   days: DateTime[];
 }
 
-const WEEKS_TO_LOAD = 8;
+const WEEKS_TO_LOAD = 12;
 const MAX_WEEKS_IN_MEMORY = 32;
 
 const generateWeek = (startDate: DateTime): Week => {
