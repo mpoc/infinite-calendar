@@ -153,7 +153,7 @@ export const App = () => {
                   return (
                     <div
                       key={day.toISODate()}
-                      className={`px-2 py-4 md:px-6 md:py-8 min-h-[80px] md:min-h-[140px] transition-all duration-200 hover:duration-0 cursor-pointer ${
+                      className={`px-2 py-4 md:px-6 md:py-8 min-h-20 md:min-h-[140px] transition-all duration-200 hover:duration-0 cursor-pointer ${
                         // Right border (vertical)
                         hasMonthBoundaryAfter
                           ? 'border-r-2 border-r-black'
