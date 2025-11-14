@@ -1,5 +1,5 @@
 import "./index.css"
-import { useState, useCallback, useRef, useLayoutEffect } from 'react';
+import { useState, useCallback, useRef, useLayoutEffect, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import { useInView } from 'react-intersection-observer';
 
@@ -41,6 +41,18 @@ export const App = () => {
 
   const scrollAdjustmentRef = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile for responsive loading thresholds
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useLayoutEffect(() => {
     if (scrollAdjustmentRef.current !== 0 && containerRef.current) {
@@ -90,14 +102,14 @@ export const App = () => {
     onChange: (inView) => {
       if (inView) loadMoreAbove();
     },
-    rootMargin: '1200px 0px 0px 0px',
+    rootMargin: `${isMobile ? '1200px' : '800px'} 0px 0px 0px`,
   });
 
   const { ref: bottomSentinelRef } = useInView({
     onChange: (inView) => {
       if (inView) loadMoreBelow();
     },
-    rootMargin: '0px 0px 1200px 0px',
+    rootMargin: `0px 0px ${isMobile ? '1200px' : '800px'} 0px`,
   });
 
   const today = DateTime.now().startOf('day');
