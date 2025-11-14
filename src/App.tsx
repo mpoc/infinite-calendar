@@ -1,5 +1,5 @@
 import "./index.css"
-import { useState, useCallback, useRef, useLayoutEffect } from 'react';
+import { useState, useCallback, useRef, useLayoutEffect, useMemo } from 'react';
 import { DateTime } from 'luxon';
 import { useInView } from 'react-intersection-observer';
 
@@ -9,8 +9,8 @@ type Week = {
   days: DateTime[];
 }
 
-const WEEKS_TO_LOAD = 12;
-const MAX_WEEKS_IN_MEMORY = 32;
+const WEEKS_TO_LOAD = 20;
+const MAX_WEEKS_IN_MEMORY = 60;
 
 const generateWeek = (startDate: DateTime): Week => {
   const days = Array.from({ length: 7 }, (_, i) => startDate.plus({ days: i }));
@@ -34,13 +34,18 @@ const getMonthLabel = (week: Week): string | null => {
 export const App = () => {
   const [weeks, setWeeks] = useState<Week[]>(() => {
     const today = DateTime.now().startOf('week');
-    return Array.from({ length: 20 }, (_, i) =>
-      generateWeek(today.plus({ weeks: i - 10 }))
+    return Array.from({ length: MAX_WEEKS_IN_MEMORY }, (_, i) =>
+      generateWeek(today.plus({ weeks: i - Math.floor(MAX_WEEKS_IN_MEMORY / 2) }))
     );
   });
 
   const scrollAdjustmentRef = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const rootMargin = useMemo(() => {
+    const margin = Math.max(800, window.innerHeight / 1.5);
+    return `${margin}px`;
+  }, []);
 
   useLayoutEffect(() => {
     if (scrollAdjustmentRef.current !== 0 && containerRef.current) {
@@ -90,14 +95,14 @@ export const App = () => {
     onChange: (inView) => {
       if (inView) loadMoreAbove();
     },
-    rootMargin: '400px 0px 0px 0px',
+    rootMargin: `${rootMargin} 0px 0px 0px`,
   });
 
   const { ref: bottomSentinelRef } = useInView({
     onChange: (inView) => {
       if (inView) loadMoreBelow();
     },
-    rootMargin: '0px 0px 400px 0px',
+    rootMargin: `0px 0px ${rootMargin} 0px`,
   });
 
   const today = DateTime.now().startOf('day');
