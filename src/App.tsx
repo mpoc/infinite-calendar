@@ -114,8 +114,9 @@ export const App = () => {
       <div>
         <div ref={topSentinelRef} className="h-px" />
 
-        {weeks.map((week) => {
+        {weeks.map((week, weekIndex) => {
           const monthLabel = getMonthLabel(week);
+          const nextWeek = weeks[weekIndex + 1];
 
           return (
             <div key={week.id}>
@@ -128,7 +129,7 @@ export const App = () => {
                 </div>
               )}
 
-              <div className="grid grid-cols-7 md:grid-cols-[140px_repeat(7,1fr)] border-b border-gray-400">
+              <div className="grid grid-cols-7 md:grid-cols-[140px_repeat(7,1fr)]">
                 {/* Month label column - desktop only */}
                 <div className="hidden md:flex px-6 py-8 border-r border-gray-400 items-start justify-end">
                   {monthLabel && (
@@ -139,14 +140,30 @@ export const App = () => {
                 </div>
 
                 {/* Day cells */}
-                {week.days.map((day) => {
+               {week.days.map((day, dayIndex) => {
                   const isToday = day.hasSame(today, 'day');
                   const isWeekend = day.weekday === 6 || day.weekday === 7;
+
+                  const nextDay = week.days[dayIndex + 1];
+                  const hasMonthBoundaryAfter = nextDay && day.month !== nextDay.month;
+
+                  const dayBelow = nextWeek?.days[dayIndex];
+                  const hasMonthBoundaryBelow = dayBelow && day.month !== dayBelow.month;
 
                   return (
                     <div
                       key={day.toISODate()}
-                      className={`px-2 py-4 md:px-6 md:py-8 border-r border-gray-400 last:border-r-0 min-h-[80px] md:min-h-[140px] transition-all duration-200 hover:duration-0 cursor-pointer ${
+                      className={`px-2 py-4 md:px-6 md:py-8 min-h-[80px] md:min-h-[140px] transition-all duration-200 hover:duration-0 cursor-pointer ${
+                        // Right border (vertical)
+                        hasMonthBoundaryAfter
+                          ? 'border-r-2 border-r-black'
+                          : 'border-r border-r-gray-400 last:border-r-0'
+                      } ${
+                        // Bottom border (horizontal)
+                        hasMonthBoundaryBelow
+                          ? 'border-b-2 border-b-black'
+                          : 'border-b border-b-gray-400'
+                      } ${
                         isToday
                           ? 'bg-gray-600 text-white'
                           : isWeekend
