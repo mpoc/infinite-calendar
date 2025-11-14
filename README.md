@@ -3,17 +3,23 @@
 To install dependencies:
 
 ```bash
-bun install
+bun i
 ```
 
 To start a development server:
 
 ```bash
-bun dev
+bun run dev
+```
+
+To build for production:
+
+```bash
+bun run build
 ```
 
 To run for production:
 
 ```bash
-bun start
+bun run start
 ```
