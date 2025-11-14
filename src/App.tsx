@@ -90,14 +90,14 @@ export const App = () => {
     onChange: (inView) => {
       if (inView) loadMoreAbove();
     },
-    rootMargin: '400px 0px 0px 0px',
+    rootMargin: '1200px 0px 0px 0px',
   });
 
   const { ref: bottomSentinelRef } = useInView({
     onChange: (inView) => {
       if (inView) loadMoreBelow();
     },
-    rootMargin: '0px 0px 400px 0px',
+    rootMargin: '0px 0px 1200px 0px',
   });
 
   const today = DateTime.now().startOf('day');
