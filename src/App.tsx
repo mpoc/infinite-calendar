@@ -144,40 +144,7 @@ export const App = () => {
                 </div>
 
                 {/* Day cells */}
-               {week.days.map((day, dayIndex) => {
-                  const isToday = day.hasSame(today, 'day');
-                  const isWeekend = day.weekday === 6 || day.weekday === 7;
-
-                  const nextDay = week.days[dayIndex + 1];
-                  const hasMonthBoundaryAfter = nextDay && day.month !== nextDay.month;
-
-                  const dayBelow = nextWeek?.days[dayIndex];
-                  const hasMonthBoundaryBelow = dayBelow && day.month !== dayBelow.month;
-
-                  return (
-                    <div
-                      key={day.toISODate()}
-                      className={cn(
-                        "px-2 py-4 md:px-6 md:py-8 min-h-20 md:min-h-[140px]",
-                        "transition-all duration-200 hover:duration-0 cursor-pointer",
-                        // Right border (vertical)
-                        hasMonthBoundaryAfter
-                          ? "border-r-2 border-r-black"
-                          : "border-r border-r-gray-400 last:border-r-0",
-                        // Bottom border (horizontal)
-                        hasMonthBoundaryBelow
-                          ? "border-b-2 border-b-black"
-                          : "border-b border-b-gray-400",
-                        // Background and text colors
-                        isToday && "bg-gray-600 text-white",
-                        !isToday && isWeekend && "bg-gray-200 hover:bg-gray-500 hover:text-white",
-                        !isToday && !isWeekend && "hover:bg-gray-500 hover:text-white"
-                      )}
-                    >
-                      <div className="text-lg md:text-2xl leading-none">{day.day}</div>
-                    </div>
-                  );
-                })}
+               {week.days.map((day, dayIndex) => <Day key={day.toISODate()} day={day} today={today} week={week} dayIndex={dayIndex} nextWeek={nextWeek} />)}
               </div>
             </div>
           );
@@ -185,6 +152,53 @@ export const App = () => {
 
         <div ref={bottomSentinelRef} className="h-px" />
       </div>
+    </div>
+  );
+};
+
+const Day = ({
+  day,
+  today,
+  week,
+  dayIndex,
+  nextWeek
+}: {
+  day: DateTime;
+  today: DateTime;
+  week: Week;
+  dayIndex: number;
+  nextWeek?: Week;
+}) => {
+  const isToday = day.hasSame(today, 'day');
+  const isWeekend = day.weekday === 6 || day.weekday === 7;
+
+  const nextDay = week.days[dayIndex + 1];
+  const hasMonthBoundaryAfter = nextDay && day.month !== nextDay.month;
+
+  const dayBelow = nextWeek?.days[dayIndex];
+  const hasMonthBoundaryBelow = dayBelow && day.month !== dayBelow.month;
+
+  return (
+    <div
+      key={day.toISODate()}
+      className={cn(
+        "px-2 py-4 md:px-6 md:py-8 min-h-20 md:min-h-[140px]",
+        "transition-all duration-200 hover:duration-0 cursor-pointer",
+        // Right border (vertical)
+        hasMonthBoundaryAfter
+          ? "border-r-2 border-r-black"
+          : "border-r border-r-gray-400 last:border-r-0",
+        // Bottom border (horizontal)
+        hasMonthBoundaryBelow
+          ? "border-b-2 border-b-black"
+          : "border-b border-b-gray-400",
+        // Background and text colors
+        isToday && "bg-gray-600 text-white",
+        !isToday && isWeekend && "bg-gray-200 hover:bg-gray-500 hover:text-white",
+        !isToday && !isWeekend && "hover:bg-gray-500 hover:text-white"
+      )}
+    >
+      <div className="text-lg md:text-2xl leading-none">{day.day}</div>
     </div>
   );
 };
