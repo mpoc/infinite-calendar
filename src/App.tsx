@@ -31,6 +31,21 @@ const getMonthLabel = (week: Week): string | null => {
   return null;
 };
 
+const hasMonthBoundaryBetweenWeeks = (currentWeek: Week, nextWeek: Week | undefined): boolean => {
+  if (!nextWeek) return false;
+
+  // Check if any corresponding day (same weekday position) crosses a month boundary
+  for (let i = 0; i < 7; i++) {
+    const currentDay = currentWeek.days[i];
+    const nextDay = nextWeek.days[i];
+    if (currentDay.month !== nextDay.month) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 export const App = () => {
   const [weeks, setWeeks] = useState<Week[]>(() => {
     const today = DateTime.now().startOf('week');
@@ -114,8 +129,10 @@ export const App = () => {
       <div>
         <div ref={topSentinelRef} className="h-px" />
 
-        {weeks.map((week) => {
+        {weeks.map((week, weekIndex) => {
           const monthLabel = getMonthLabel(week);
+          const nextWeek = weeks[weekIndex + 1];
+          const hasMonthBoundary = hasMonthBoundaryBetweenWeeks(week, nextWeek);
 
           return (
             <div key={week.id}>
@@ -128,7 +145,9 @@ export const App = () => {
                 </div>
               )}
 
-              <div className="grid grid-cols-7 md:grid-cols-[140px_repeat(7,1fr)] border-b border-gray-300">
+              <div className={`grid grid-cols-7 md:grid-cols-[140px_repeat(7,1fr)] ${
+                hasMonthBoundary ? 'border-b-2 border-gray-600' : 'border-b border-gray-300'
+              }`}>
                 {/* Month label column - desktop only */}
                 <div className="hidden md:flex px-6 py-8 border-r border-gray-300 items-start justify-end">
                   {monthLabel && (
@@ -139,14 +158,20 @@ export const App = () => {
                 </div>
 
                 {/* Day cells */}
-                {week.days.map((day) => {
+                {week.days.map((day, dayIndex) => {
                   const isToday = day.hasSame(today, 'day');
                   const isWeekend = day.weekday === 6 || day.weekday === 7;
+                  const nextDay = week.days[dayIndex + 1];
+                  const hasMonthBoundaryAfter = nextDay && day.month !== nextDay.month;
 
                   return (
                     <div
                       key={day.toISODate()}
-                      className={`px-2 py-4 md:px-6 md:py-8 border-r border-gray-300 last:border-r-0 min-h-[80px] md:min-h-[140px] transition-all duration-200 cursor-pointer ${
+                      className={`px-2 py-4 md:px-6 md:py-8 min-h-[80px] md:min-h-[140px] transition-all duration-200 cursor-pointer ${
+                        hasMonthBoundaryAfter
+                          ? 'border-r-2 border-gray-600'
+                          : 'border-r border-gray-300 last:border-r-0'
+                      } ${
                         isToday
                           ? 'bg-black text-white'
                           : isWeekend
