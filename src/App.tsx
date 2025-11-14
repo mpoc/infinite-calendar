@@ -1,5 +1,5 @@
 import "./index.css"
-import { useState, useCallback, useRef, useLayoutEffect, useEffect } from 'react';
+import { useState, useCallback, useRef, useLayoutEffect, useMemo } from 'react';
 import { DateTime } from 'luxon';
 import { useInView } from 'react-intersection-observer';
 
@@ -42,16 +42,11 @@ export const App = () => {
   const scrollAdjustmentRef = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Detect mobile for responsive loading thresholds
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+  // Calculate root margin based on viewport height for responsive loading
+  // Using 2x viewport height ensures weeks load ~2 screens ahead
+  const rootMargin = useMemo(() => {
+    const margin = Math.max(800, window.innerHeight * 2);
+    return `${margin}px`;
   }, []);
 
   useLayoutEffect(() => {
@@ -102,14 +97,14 @@ export const App = () => {
     onChange: (inView) => {
       if (inView) loadMoreAbove();
     },
-    rootMargin: `${isMobile ? '1200px' : '800px'} 0px 0px 0px`,
+    rootMargin: `${rootMargin} 0px 0px 0px`,
   });
 
   const { ref: bottomSentinelRef } = useInView({
     onChange: (inView) => {
       if (inView) loadMoreBelow();
     },
-    rootMargin: `0px 0px ${isMobile ? '1200px' : '800px'} 0px`,
+    rootMargin: `0px 0px ${rootMargin} 0px`,
   });
 
   const today = DateTime.now().startOf('day');
