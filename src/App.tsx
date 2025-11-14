@@ -2,6 +2,7 @@ import "./index.css"
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { DateTime } from 'luxon';
 import { useInView } from 'react-intersection-observer';
+import { cn } from './cn';
 
 type Week = {
   id: string;
@@ -101,7 +102,10 @@ export const App = () => {
           {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day, idx) => (
             <div
               key={day}
-              className="px-2 py-3 md:px-6 md:py-5 text-center border-r border-gray-300 last:border-r-0 text-xs md:text-base"
+              className={cn(
+                "px-2 py-3 md:px-6 md:py-5 text-center text-xs md:text-base",
+                "border-r border-gray-300 last:border-r-0"
+              )}
             >
               <span className="md:hidden">{day.slice(0, 3)}</span>
               <span className="hidden md:inline">{day}</span>
@@ -153,23 +157,22 @@ export const App = () => {
                   return (
                     <div
                       key={day.toISODate()}
-                      className={`px-2 py-4 md:px-6 md:py-8 min-h-20 md:min-h-[140px] transition-all duration-200 hover:duration-0 cursor-pointer ${
+                      className={cn(
+                        "px-2 py-4 md:px-6 md:py-8 min-h-20 md:min-h-[140px]",
+                        "transition-all duration-200 hover:duration-0 cursor-pointer",
                         // Right border (vertical)
                         hasMonthBoundaryAfter
-                          ? 'border-r-2 border-r-black'
-                          : 'border-r border-r-gray-400 last:border-r-0'
-                      } ${
+                          ? "border-r-2 border-r-black"
+                          : "border-r border-r-gray-400 last:border-r-0",
                         // Bottom border (horizontal)
                         hasMonthBoundaryBelow
-                          ? 'border-b-2 border-b-black'
-                          : 'border-b border-b-gray-400'
-                      } ${
-                        isToday
-                          ? 'bg-gray-600 text-white'
-                          : isWeekend
-                          ? 'bg-gray-200 hover:bg-gray-500 hover:text-white'
-                          : 'hover:bg-gray-500 hover:text-white'
-                      }`}
+                          ? "border-b-2 border-b-black"
+                          : "border-b border-b-gray-400",
+                        // Background and text colors
+                        isToday && "bg-gray-600 text-white",
+                        !isToday && isWeekend && "bg-gray-200 hover:bg-gray-500 hover:text-white",
+                        !isToday && !isWeekend && "hover:bg-gray-500 hover:text-white"
+                      )}
                     >
                       <div className="text-lg md:text-2xl leading-none">{day.day}</div>
                     </div>
