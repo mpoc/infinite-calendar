@@ -1,5 +1,5 @@
 import "./index.css"
-import { useState, useCallback, useRef, useLayoutEffect, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { DateTime } from 'luxon';
 import { useInView } from 'react-intersection-observer';
 
@@ -39,7 +39,6 @@ export const App = () => {
     );
   });
 
-  const scrollAdjustmentRef = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const rootMargin = useMemo(() => {
@@ -47,16 +46,7 @@ export const App = () => {
     return `${margin}px`;
   }, []);
 
-  useLayoutEffect(() => {
-    if (scrollAdjustmentRef.current !== 0 && containerRef.current) {
-      window.scrollBy(0, scrollAdjustmentRef.current);
-      scrollAdjustmentRef.current = 0;
-    }
-  }, [weeks]);
-
   const loadMoreAbove = useCallback(() => {
-    const scrollHeightBefore = document.documentElement.scrollHeight;
-
     setWeeks(prev => {
       const firstWeek = prev.at(0).startDate;
       const newWeeks = Array.from({ length: WEEKS_TO_LOAD }, (_, i) =>
@@ -67,11 +57,6 @@ export const App = () => {
       const result = updated.length > MAX_WEEKS_IN_MEMORY
         ? updated.slice(0, MAX_WEEKS_IN_MEMORY)
         : updated;
-
-      requestAnimationFrame(() => {
-        const scrollHeightAfter = document.documentElement.scrollHeight;
-        scrollAdjustmentRef.current = scrollHeightAfter - scrollHeightBefore;
-      });
 
       return result;
     });
